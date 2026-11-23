@@ -4,6 +4,7 @@ metadata:
   name: web
   namespace: lab01
   annotations:
+#    service.beta.kubernetes.io/aws-load-balancer-schema: internet
     service.beta.kubernetes.io/aws-load-balancer-schema: internet-facing
 spec:
 #  type: ClusterIP
