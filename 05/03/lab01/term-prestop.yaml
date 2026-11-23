@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: term-prestop
+  namespace: lab01
+spec:
+  terminationGracePeriodSeconds: 5
+  containers:
+  - name: nginx
+    image: nginx:1.30
+    lifecycle:
+      preStop:
+        exec:
+          command: ["sh", "-c", "echo preStop start > /proc/1/fd/1; sleep 5; echo preStop end > /proc/1/fd/1"] # 프로세스 1번(nginx)의 1번(stdout)으로 로그 전송

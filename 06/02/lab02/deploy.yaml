@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: lab02
+spec:
+  replicas: 4
+  
+  selector:
+    matchLabels:
+      app: nginx
+  
+  # Pod; Pod.yaml에서 apiVersion, kind 제외 metadata 부터 붙여넣기 (name, namespace 빼고)
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:30
+        ports:
+        - containerPort: 80

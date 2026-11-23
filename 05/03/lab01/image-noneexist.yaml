@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-noneexist
+  namespace: lab01
+  labels:
+    app: web
+spec:
+  containers:
+  - name: alpine
+    image: alpine:none
