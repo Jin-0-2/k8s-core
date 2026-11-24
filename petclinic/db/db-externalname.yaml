@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: petclinic
+spec:
+  type: ExternalName
+  externalName: petclinic-rds.cvy2eqcscdub.ap-northeast-2.rds.amazonaws.com
