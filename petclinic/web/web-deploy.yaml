@@ -37,7 +37,7 @@ spec:
         runAsGroup: 82
       containers:
       - name: web
-        image: \982082153297.dkr.ecr.ap-northeast-2.amazonaws.com/petclinic-web:0.0.2
+        image: 982082153297.dkr.ecr.ap-northeast-2.amazonaws.com/petclinic-web:0.0.2
         ports:
         - containerPort: 8000
         env:
