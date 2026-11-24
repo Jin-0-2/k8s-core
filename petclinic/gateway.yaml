@@ -1,23 +1,10 @@
-apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
+apiVersion: gateway.k8s.aws/v1
+kind: LoadBalancerConfiguration
 metadata:
-  name: envoy
-spec:
-  controllerName: gateway.envoyproxy.io/gatewayclass-controller
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyProxy
-metadata:
-  name: proxy
+  name: lb-configuration
   namespace: petclinic
 spec:
-  provider:
-    type: Kubernetes
-    kubernetes:
-      envoyDeployment:
-        replicas: 1
-      envoyService:
-        type: NodePort
+  scheme: internet-facing
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -25,12 +12,12 @@ metadata:
   name: app
   namespace: petclinic
 spec:
-  gatewayClassName: envoy
+  gatewayClassName: eks
   infrastructure:
     parametersRef:
-      group: gateway.envoyproxy.io
-      kind: EnvoyProxy
-      name: proxy
+      group: gateway.k8s.aws
+      kind: LoadBalancerConfiguration
+      name: lb-configuration
   listeners:
   - name: http
     protocol: HTTP

@@ -32,7 +32,6 @@ spec:
       - maxSkew: 1
         topologyKey: kubernetes.io/hostname
         whenUnsatisfiable: DoNotSchedule
-        nodeTaintsPolicy: Honor
         labelSelector:
           matchLabels:
             app: petclinic
@@ -49,7 +48,7 @@ spec:
         - until nc -z -w 2 db.petclinic.svc 3306; do echo "waiting for db"; sleep 3; done
       containers:
       - name: was
-        image: jindoring/petclinic-was:0.0.2
+        image: 982082153297.dkr.ecr.ap-northeast-2.amazonaws.com/petclinic-was:0.0.2
         ports:
         - containerPort: 8080
 

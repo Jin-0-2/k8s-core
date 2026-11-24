@@ -10,7 +10,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /a
+        value: /
     backendRefs:
     - name: web
       port: 8000

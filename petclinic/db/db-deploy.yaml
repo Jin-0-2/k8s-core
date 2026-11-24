@@ -26,7 +26,7 @@ spec:
         fsGroup: 999
       containers:
       - name: mysql
-        image: jindoring/petclinic-db:0.0.2
+        image: 982082153297.dkr.ecr.ap-northeast-2.amazonaws.com/petclinic-db:0.0.2
         ports:
         - containerPort: 3306
         env:
