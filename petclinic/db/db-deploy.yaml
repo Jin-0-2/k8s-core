@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+  namespace: petclinic
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: petclinic
+      tier: db
+  template:
+    metadata:
+      labels:
+        app: petclinic
+        tier: db
+    spec:
+      serviceAccountName: db
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+      - name: mysql
+        image: jindoring/petclinic-db:0.0.2
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: petclinic-secret, key: MYSQL_ROOT_PASSWORD}
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: petclinic-secret, key: DB_PASSWORD}
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: MYSQL_DATABASE}
+        - name: MYSQL_USER
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: MYSQL_USER}
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {memory: 1Gi}
+        startupProbe:
+          exec:
+            command: ["mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+          periodSeconds: 5
+          failureThreshold: 30
+        readinessProbe:
+          exec:
+            command: ["mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+          timeoutSeconds: 3
+          periodSeconds: 5
+          failureThreshold: 3
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: db-data

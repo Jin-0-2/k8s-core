@@ -1,0 +1,29 @@
+ID	항목	결과	상세
+TC-01	로그인 성공 (간호사)	PASS	HTTP 200, role=desk
+TC-02	로그인 성공 (수의사)	PASS	HTTP 200, role=vet
+TC-03	로그인 실패	PASS	HTTP 401
+TC-04	세션 유지 (쿠키로 보호 경로 재호출)	PASS	HTTP 200
+TC-05	로그아웃	PASS	로그아웃 HTTP 200, 이후 보호 경로 HTTP 401
+TC-06	권한 분리 (수의사가 /desk 호출)	PASS	HTTP 401
+TC-10	보호자와 동물 등록	PASS	HTTP 200, oid=2, pid=3
+TC-11	동물 추가 등록	PASS	HTTP 200, 동물 수=2
+TC-12	방문 등록	PASS	HTTP 200, cid=3, status=대기
+TC-20	보호자 검색	PASS	HTTP 200, 검색 결과 1건
+TC-21	보호자 상세	PASS	HTTP 200, 동물 2마리, 진행 중 진료 동물 [3]
+TC-22	지점 수의사 목록	PASS	HTTP 200, 강남점 수의사 2명
+TC-23	진료 이력	PASS	HTTP 200, 이력 1건
+TC-24	수의사 대기 목록	PASS	HTTP 200, 배정 진료 2건
+TC-30	보호자 정보 수정	PASS	PATCH HTTP 200, 재조회 address=서울 서초구 수정
+TC-31	동물 정보 수정	PASS	PATCH HTTP 200, 재조회 age=4
+TC-32	진료 시작	PASS	HTTP 200, status=진료중
+TC-33	진단 작성 (재수정 포함)	PASS	PATCH HTTP 200, 재조회 diagnosis=건강함 최종
+TC-34	진료 종료	PASS	HTTP 200, status=종료
+TC-40	지점 격리 (타 지점 보호자 조회)	PASS	HTTP 404
+TC-41	타 지점 수의사 배정	PASS	HTTP 404
+TC-42	순서 위반 (대기 상태에서 종료)	PASS	HTTP 404
+TC-43	남의 진료 접근	PASS	HTTP 404
+TC-44	입력 검증 (필수 값 누락)	PASS	HTTP 422
+TC-45	프록시 제외 경로 (WEB 경유 /api/docs)	PASS	HTTP 404
+TC-46	화면 로딩 (/, /app.js)	PASS	/ HTTP 200, /app.js HTTP 200
+TC-50	WAS 재시작 후 데이터 유지	PASS	HTTP 200, oname=테스트1124022039보호자
+TC-51	WAS 재시작 후 세션 유지	PASS	재시작 전 쿠키로 HTTP 200

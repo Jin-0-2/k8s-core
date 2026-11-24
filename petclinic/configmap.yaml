@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: petclinic-config
+  namespace: petclinic
+data:
+  DB_HOST: db
+  DB_USER: petclinic_app
+  MYSQL_DATABASE: petclinic
+  MYSQL_USER: petclinic_app
+  BACKEND_URL: http://was:8080
+  WAS_HOST: "0.0.0.0"
+  WAS_PORT: "8080"
+  COOKIE_SECURE: "false"

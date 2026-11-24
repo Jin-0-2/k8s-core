@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: petclinic
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  selector:
+    matchLabels:
+      app: petclinic
+      tier: web
+  template:
+    metadata:
+      labels:
+        app: petclinic
+        tier: web
+    spec:
+      serviceAccountName: web
+      automountServiceAccountToken: false
+      
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        nodeTaintsPolicy: Honor
+        labelSelector:
+          matchLabels:
+            app: petclinic
+            tier: web
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 82
+        runAsGroup: 82
+      containers:
+      - name: web
+        image: jindoring/petclinic-web:0.0.2
+        ports:
+        - containerPort: 8000
+        env:
+        - name: BACKEND_URL
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: BACKEND_URL}
+        resources:
+          requests: {cpu: 50m, memory: 64Mi}
+          limits: {memory: 128Mi}
+        readinessProbe:
+          httpGet: {path: /, port: 8000}
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet: {path: /, port: 8000}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 3

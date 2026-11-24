@@ -1,0 +1,23 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: was-pdb
+  namespace: petclinic
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: petclinic
+      tier: was
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-pdb
+  namespace: petclinic
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: petclinic
+      tier: web

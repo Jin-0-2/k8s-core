@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: was
+  namespace: petclinic
+spec:
+  replicas: 2
+
+  minReadySeconds: 5
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: petclinic
+      tier: was
+  template:
+    metadata:
+      labels:
+        app: petclinic
+        tier: was
+    spec:
+      serviceAccountName: was
+      automountServiceAccountToken: false
+      
+      terminationGracePeriodSeconds: 30
+      enableServiceLinks: false
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        nodeTaintsPolicy: Honor
+        labelSelector:
+          matchLabels:
+            app: petclinic
+            tier: was
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+      initContainers:
+      - name: wait-db
+        image: busybox:1.37
+        command: ["sh", "-c"]
+        args:
+        - until nc -z -w 2 db.petclinic.svc 3306; do echo "waiting for db"; sleep 3; done
+      containers:
+      - name: was
+        image: jindoring/petclinic-was:0.0.2
+        ports:
+        - containerPort: 8080
+
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sleep", "10"]
+
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: DB_HOST}
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: DB_USER}
+        - name: WAS_HOST
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: WAS_HOST}
+        - name: WAS_PORT
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: WAS_PORT}
+        - name: COOKIE_SECURE
+          valueFrom:
+            configMapKeyRef: {name: petclinic-config, key: COOKIE_SECURE}
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: petclinic-secret, key: DB_PASSWORD}
+        - name: SEED_PASSWORD
+          valueFrom:
+            secretKeyRef: {name: petclinic-secret, key: SEED_PASSWORD}
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {memory: 512Mi}
+        startupProbe:
+          httpGet: {path: /health, port: 8080}
+          periodSeconds: 2
+          failureThreshold: 30
+        readinessProbe:
+          httpGet: {path: /health, port: 8080}
+          timeoutSeconds: 1
+          periodSeconds: 5
+          failureThreshold: 3
+        livenessProbe:
+          httpGet: {path: /health, port: 8080}
+          timeoutSeconds: 1
+          periodSeconds: 10
+          failureThreshold: 3
